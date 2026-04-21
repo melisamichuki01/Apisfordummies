@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APIs for Dummies: A Data Scientist's Guide | MLlabswithMel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #faf9ff; --surface: #f3f0ff; --surface-2: #ede9ff;
+      --purple: #7f77dd; --purple-dk: #534ab7; --purple-lt: #e8e5ff;
+      --teal: #1d9e75; --teal-lt: #d4f0e6;
+      --coral: #d85a30; --coral-lt: #faecea;
+      --amber: #ba7517; --amber-lt: #fef3dc;
+      --text: #1a1633; --muted: #6b5fa8; --faint: #9b94cc;
+      --code-bg: #ede9ff; --code-text: #534ab7;
+      --border: #c4bde8; --border-lt: #e2defc;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.05rem; line-height: 1.75; }
+
+    .site-header { background: var(--surface); border-bottom: 2px solid var(--purple); padding: 2.5rem 1.5rem 2rem; text-align: center; }
+    .site-header .brand { font-size: 0.85rem; font-weight: 700; color: var(--purple-dk); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .site-header h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 700; line-height: 1.2; color: var(--text); margin-bottom: 0.6rem; }
+    .site-header h1 em { color: var(--purple); font-style: normal; }
+    .site-header p { color: var(--muted); font-size: 1rem; max-width: 580px; margin: 0 auto; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; margin-top: 1rem; }
+    .tag { background: var(--purple-lt); color: var(--purple-dk); font-size: .75rem; font-weight: 600; padding: .2rem .75rem; border-radius: 999px; font-family: 'JetBrains Mono', monospace; }
+
+    .prereqs { max-width: 900px; margin: 1.5rem auto 0; padding: 0 1.5rem; }
+    .prereqs-box { background: var(--amber-lt); border: 1.5px solid #f0c060; border-radius: 12px; padding: 1.2rem 1.5rem; }
+    .prereqs-box h3 { font-size: .85rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--amber); margin-bottom: .7rem; }
+    .prereqs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: .5rem; }
+    .prereq-item { display: flex; align-items: flex-start; gap: .5rem; font-size: .88rem; }
+    .prereq-dot { width: 6px; height: 6px; min-width: 6px; background: var(--amber); border-radius: 50%; margin-top: .55rem; }
+
+    .toc { background: var(--surface); border: 1.5px solid var(--border-lt); border-radius: 12px; padding: 1.5rem; margin: 1.5rem auto; max-width: 900px; }
+    .toc h3 { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: .8rem; }
+    .toc ol { padding-left: 1.2rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: .25rem; }
+    .toc ol li a { color: var(--purple-dk); text-decoration: none; font-size: .88rem; font-weight: 500; transition: color .15s; }
+    .toc ol li a:hover, .toc ol li a.active { color: var(--purple); font-weight: 700; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 0 1.5rem 4rem; }
+    section { margin-bottom: 4rem; scroll-margin-top: 2rem; }
+    section h2 { font-size: clamp(1.3rem, 3vw, 1.8rem); font-weight: 700; color: var(--text); margin-bottom: 1.2rem; padding-bottom: .6rem; border-bottom: 2px solid var(--border-lt); display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+    .section-num { display: inline-flex; align-items: center; justify-content: center; background: var(--purple); color: #fff; font-size: .7rem; font-weight: 700; width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; }
+    .done-check { margin-left: auto; display: flex; align-items: center; gap: .4rem; font-size: .78rem; font-weight: 600; color: var(--faint); cursor: pointer; user-select: none; transition: color .15s; }
+    .done-check:hover { color: var(--teal); }
+    .done-check.checked { color: var(--teal); }
+    .done-check-box { width: 16px; height: 16px; border: 1.5px solid var(--border); border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: background .15s, border-color .15s; }
+    .done-check.checked .done-check-box { background: var(--teal); border-color: var(--teal); }
+    .done-check-tick { display: none; color: #fff; font-size: 10px; font-weight: 800; }
+    .done-check.checked .done-check-tick { display: block; }
+    section h3 { font-size: 1.1rem; font-weight: 700; color: var(--purple-dk); margin: 1.8rem 0 .6rem; }
+    section p { margin-bottom: 1rem; }
+    section ul, section ol { padding-left: 1.4rem; margin-bottom: 1rem; }
+    section li { margin-bottom: .4rem; }
+
+    .card { border-radius: 10px; margin: 1.5rem 0; overflow: hidden; border-left: 4px solid transparent; }
+    .card-header { padding: .75rem 1.2rem; font-size: .92rem; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+    .card-header::after { content: '▼'; font-size: .65rem; transition: transform .2s; }
+    .card.open .card-header::after { transform: rotate(180deg); }
+    .card-body { padding: 1rem 1.2rem 1.2rem; display: none; font-size: .96rem; }
+    .card.open .card-body { display: block; }
+    .card-body p { margin-bottom: .7rem; }
+    .card-body p:last-child { margin-bottom: 0; }
+    .card-body ul { padding-left: 1.2rem; }
+    .card-body li { margin-bottom: .3rem; }
+    .slowdown-card { background: var(--coral-lt); border-color: var(--coral); }
+    .slowdown-card .card-header { background: #f8dcd5; color: #8b2e10; }
+    .explain-card { background: var(--purple-lt); border-color: var(--purple); }
+    .explain-card .card-header { background: #ddd9f8; color: var(--purple-dk); }
+    .analogy-card { background: var(--teal-lt); border-color: var(--teal); }
+    .analogy-card .card-header { background: #c0e8d8; color: #0a4a30; }
+
+    .code-block { background: var(--code-bg); border-radius: 10px; margin: 1.2rem 0; overflow: hidden; border: 1.5px solid var(--border-lt); }
+    .code-label { display: flex; align-items: center; justify-content: space-between; padding: .45rem 1rem; font-family: 'JetBrains Mono', monospace; font-size: .75rem; font-weight: 500; border-bottom: 1px solid var(--border-lt); }
+    .code-label.terminal { background: #dff5ec; color: #0a4a30; }
+    .code-label.script   { background: var(--amber-lt); color: #6b3a00; }
+    .code-label.output   { background: var(--surface-2); color: var(--muted); }
+    .code-label.json-lb  { background: #f0ebff; color: var(--purple-dk); }
+    .code-label.env-lb   { background: var(--amber-lt); color: #6b3a00; }
+    .copy-btn { background: none; border: 1px solid var(--border); border-radius: 5px; padding: 2px 8px; font-size: .7rem; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; color: var(--muted); cursor: pointer; transition: background .15s, color .15s; }
+    .copy-btn:hover { background: var(--purple-lt); color: var(--purple-dk); }
+    .copy-btn.copied { color: var(--teal); border-color: var(--teal); }
+    pre { padding: 1.2rem; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: .85rem; line-height: 1.75; color: var(--code-text); white-space: pre; }
+    .cm { color: #9b94cc; } .kw { color: var(--purple); } .st { color: var(--teal); } .fn { color: var(--amber); } .nm { color: var(--coral); }
+
+    .method { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: .75rem; font-weight: 500; padding: .15rem .55rem; border-radius: 5px; margin-right: .3rem; }
+    .GET { background: #dff5ec; color: #0a4a30; } .POST { background: var(--purple-lt); color: var(--purple-dk); }
+    .PUT { background: var(--amber-lt); color: #6b3a00; } .DELETE { background: var(--coral-lt); color: #8b2e10; } .PATCH { background: #f0ebff; color: var(--purple-dk); }
+
+    .table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+    table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+    th { background: var(--surface); color: var(--purple-dk); font-size: .8rem; font-weight: 700; text-align: left; padding: .65rem 1rem; border-bottom: 2px solid var(--border); }
+    td { padding: .6rem 1rem; border-bottom: 1px solid var(--border-lt); vertical-align: top; }
+    tr:hover td { background: var(--surface); }
+
+    .diagram { background: var(--surface); border: 1.5px dashed var(--border); border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; font-family: 'JetBrains Mono', monospace; font-size: .85rem; line-height: 2.2; text-align: center; color: var(--muted); }
+    .diagram strong { color: var(--purple-dk); } .diagram .arrow { color: var(--purple); font-size: 1.2rem; }
+
+    .callout { background: var(--teal-lt); border-left: 3px solid var(--teal); padding: .9rem 1.2rem; border-radius: 0 8px 8px 0; margin: 1.2rem 0; font-size: .95rem; }
+    .callout strong { color: var(--teal); }
+    .callout-amber { background: var(--amber-lt); border-left: 3px solid var(--amber); padding: .9rem 1.2rem; border-radius: 0 8px 8px 0; margin: 1.2rem 0; font-size: .95rem; }
+    .callout-amber strong { color: var(--amber); }
+
+    .project-banner { background: var(--surface); border: 2px solid var(--purple); border-radius: 14px; padding: 1.5rem 2rem; margin: 2rem 0 1.5rem; }
+    .project-banner h3 { font-size: 1.25rem; font-weight: 700; color: var(--text); margin: 0 0 .4rem; }
+    .project-banner p { color: var(--muted); margin: 0; font-size: .95rem; }
+    .badge { display: inline-block; background: var(--purple); color: #fff; font-size: .7rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; padding: .15rem .65rem; border-radius: 999px; margin-bottom: .5rem; }
+
+    .task-box { background: var(--surface); border: 1.5px solid var(--border-lt); border-radius: 10px; padding: 1.1rem 1.4rem; margin: 1rem 0; }
+    .task-num { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--purple); margin-bottom: .3rem; }
+    .task-box p { margin: 0; font-size: .95rem; }
+    .win-box { background: var(--teal-lt); border: 1.5px solid var(--teal); border-radius: 10px; padding: 1rem 1.4rem; margin: 1.5rem 0; color: #0a4a30; font-weight: 600; font-size: .95rem; }
+
+    footer { background: var(--surface); border-top: 1.5px solid var(--border-lt); text-align: center; padding: 2rem 1.5rem; color: var(--muted); font-size: .88rem; }
+    footer strong { color: var(--purple-dk); font-weight: 700; }
+    @media (max-width: 600px) { .toc ol, .prereqs-grid { grid-template-columns: 1fr 1fr; } pre { font-size: .76rem; } }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">MLlabswithMel</div>
+  <h1>APIs for <em>Dummies</em><br>A Data Scientist's Guide</h1>
+  <p>REST, HTTP, and how to actually use APIs in your data work — explained from zero, no fluff.</p>
+  <div class="tag-row">
+    <span class="tag">REST API</span><span class="tag">HTTP</span><span class="tag">Python requests</span><span class="tag">Beginner-friendly</span><span class="tag">Real project included</span>
+  </div>
+</header>
+
+<div class="prereqs">
+  <div class="prereqs-box">
+    <h3>Before you start — you'll need</h3>
+    <div class="prereqs-grid">
+      <div class="prereq-item"><div class="prereq-dot"></div><span>Python 3.8 or above installed</span></div>
+      <div class="prereq-item"><div class="prereq-dot"></div><span>pip available in your terminal</span></div>
+      <div class="prereq-item"><div class="prereq-dot"></div><span>VS Code (or any code editor)</span></div>
+      <div class="prereq-item"><div class="prereq-dot"></div><span>Basic Python: variables, functions, loops</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="toc">
+  <h3>What's inside</h3>
+  <ol id="toc-list">
+    <li><a href="#s1">What is an API?</a></li>
+    <li><a href="#s2">Why data scientists need this</a></li>
+    <li><a href="#s3">HTTP — the language of the web</a></li>
+    <li><a href="#s4">REST — a set of rules</a></li>
+    <li><a href="#s5">REST architecture in detail</a></li>
+    <li><a href="#s6">Anatomy of an API request</a></li>
+    <li><a href="#s7">HTTP methods explained</a></li>
+    <li><a href="#s8">Status codes you must know</a></li>
+    <li><a href="#s9">Project: Weather Data Pipeline</a></li>
+    <li><a href="#s10">Common errors and fixes</a></li>
+    <li><a href="#s11">Practice tasks</a></li>
+    <li><a href="#s12">How it all fits together</a></li>
+    <li><a href="#s13">Complete script</a></li>
+  </ol>
+</div>
+
+<main>
+
+<section id="s1">
+  <h2><span class="section-num">01</span> What is an API? <span class="done-check" onclick="toggleDone(this)"><span class="done-check-box"><span class="done-check-tick">✓</span></span>Mark done</span></h2>
+  <p>Before we touch a single line of code, let's build a real picture of what an API actually is. The letters stand for <strong>Application Programming Interface</strong> — and yes, that sounds like a lot. But the idea is simple enough that we'll get it in the next two minutes.</p>
+  <div class="card analogy-card open">
+    <div class="card-header">🔁 Think of it like a restaurant</div>
+    <div class="card-body">
+      <p>Imagine you walk into a restaurant. You don't go into the kitchen and cook your own food. You sit down, look at a menu, and give your order to the <strong>waiter</strong>. The waiter goes to the kitchen, collects your food, and brings it back to you.</p>
+      <p>The waiter is the API. You are the application (your Python script). The kitchen is the server holding the data. The menu is the list of things you're allowed to ask for. You never need to know how the kitchen works — you just need to know how to talk to the waiter.</p>
+    </div>
+  </div>
+  <p>In technical terms: an API is a set of rules that lets one program talk to another. When your Python script sends a request to an API, the API's server receives it, processes it, and sends back a response — usually as data in a format called <strong>JSON</strong>.</p>
+  <div class="card explain-card">
+    <div class="card-header">💡 What is JSON, really?</div>
+    <div class="card-body">
+      <p>JSON stands for <strong>JavaScript Object Notation</strong>. It's just a way of packaging up data so it can travel across the internet cleanly. It looks exactly like a Python dictionary. If you've written <code>{"name": "Mel", "city": "Nairobi"}</code> in Python — you already understand JSON. Curly braces, keys, and values. That's it.</p>
+    </div>
+  </div>
+</section>
+
+<section id="s2">
+  <h2><span class="section-num">02</span> Why data scientists need to know this <span class="done-check" onclick="toggleDone(this)"><span class="done-check-box"><span class="done-check-tick">✓</span></span>Mark done</span></h2>
+  <p>Most real-world data doesn't sit in a nice CSV file waiting for you. It lives inside systems — and the only way to get it out is through an API. Here are situations you will actually run into:</p>
+  <ul>
+    <li>Pulling weather data for a forecasting model</li>
+    <li>Fetching financial market prices for analysis</li>
+    <li>Pulling social media data for sentiment analysis</li>
+    <li>Sending data to an ML model hosted on a cloud service</li>
+    <li>Connecting your dashboard to a live data source</li>
+    <li>Automating data ingestion as part of a pipeline</li>
+  </ul>
+  <div class="callout"><strong>Bottom line:</strong> APIs are how the world shares data. If you want to work with real, live data — you need to know how to request it, receive it, and handle it.</div>
+</section>
+
+<section id="s3">
+  <h2><span class="section-num">03</span> HTTP — the language of the web <span class="done-check" onclick="toggleDone(this)"><span class="done-check-box"><span class="done-check-tick">✓</span></span>Mark done</span></h2>
+  <p>Before we can talk about REST APIs, we need to understand HTTP. This is the part most tutorials skip — and it's exactly why beginners feel confused later. Let's do it properly.</p>
+
+  <h3>What is HTTP?</h3>
+  <p>HTTP stands for <strong>HyperText Transfer Protocol</strong>. A "protocol" is just a set of rules for how two things communicate. HTTP is the rulebook that governs how computers talk to each other over the internet.</p>
+
+  <h3>HTTP vs HTTPS — what the S means</h3>
+  <p>You've seen both <code>http://</code> and <code>https://</code> in browser URLs. The S stands for <strong>Secure</strong>. HTTPS adds a layer of encryption — called TLS — that scrambles everything travelling between your computer and the server so no one in the middle can read it.</p>
+  <div class="card explain-card open">
+    <div class="card-header">💡 Why APIs always use HTTPS — and why your API key depends on it</div>
+    <div class="card-body">
+      <p>Every API call you make sends your API key in the request — either in the URL or in a header. If the connection is plain HTTP, that key travels as readable text across the internet. Anyone sitting on the same network (a café WiFi, a shared office connection) could intercept and steal it.</p>
+      <p>HTTPS encrypts everything in transit — your API key, your parameters, the response data. This is why all serious APIs require HTTPS and why you should <strong>never use a plain HTTP API</strong> for anything involving authentication or sensitive data.</p>
+    </div>
+  </div>
+
+  <h3>Why HTTP theory matters</h3>
+  <p>When something goes wrong — and it will — you need to read the error. HTTP errors have specific codes. If you don't know that <code>401</code> means "you didn't authenticate properly" or <code>429</code> means "too many requests," you'll waste hours debugging blind.</p>
+  <p>One more thing worth knowing now: HTTP is <strong>stateless</strong> — each request is completely independent. The server remembers absolutely nothing between calls. Every request must include your API key and all parameters every single time.</p>
+
+  <h3>The request-response cycle</h3>
+  <p>Every time you type a URL into your browser and hit Enter, this is exactly what happens behind the scenes. Understanding this cycle makes every API interaction feel familiar rather than mysterious.</p>
+  <div class="diagram">
+    <strong>Your Python Script (the client)</strong><br>
+    <span class="arrow">⬇</span><br>
+    sends an HTTPS request<br>
+    <span class="arrow">⬇</span><br>
+    <strong>DNS lookup</strong> — converts the domain name to a server IP address<br>
+    <span class="arrow">⬇</span><br>
+    <strong>The Internet</strong> routes the request to the right server<br>
+    <span class="arrow">⬇</span><br>
+    <strong>The API Server</strong> receives it and processes it<br>
+    <span class="arrow">⬇</span><br>
+    sends back an HTTPS response with data<br>
+    <span class="arrow">⬇</span><br>
+    <strong>Your Python Script</strong> receives JSON and uses the data
+  </div>
+  <div class="card analogy-card">
+    <div class="card-header">🔁 What is DNS — the internet's phonebook</div>
+    <div class="card-body">
+      <p>Your computer doesn't know where <code>api.openweathermap.org</code> lives. The internet has a phonebook called <strong>DNS (Domain Name System)</strong> that converts human-readable domain names into actual IP addresses — the real numerical location of the server. DNS runs silently in the background before your request even leaves your machine.</p>
+    </div>
+  </div>
+
+  <h3>What is inside an HTTP request?</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Part</th><th>What it is</th><th>Real example</th></tr></thead>
+      <tbody>
+        <tr><td><strong>URL</strong></td><td>The address of what you want</td><td><code>https://api.weather.com/v1/current</code></td></tr>
+        <tr><td><strong>Method</strong></td><td>What you want to do</td><td><code>GET</code> — fetch data</td></tr>
+        <tr><td><strong>Headers</strong></td><td>Extra metadata about the request</td><td>API key, content type, auth token</td></tr>
+        <tr><td><strong>Body</strong></td><td>Data you're sending (POST/PUT only)</td><td>JSON data sent to the server</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>What does a request body actually look like?</h3>
+  <p>The table above says "JSON data" for the body — but what does that mean in practice? When you make a POST request (for example, sending text to an NLP model), the data you're sending travels in the body as a JSON string. Here's what that looks like:</p>
+  <div class="code-block">
+    <div class="code-label json-lb"><span>POST request body — what travels inside it</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre>
+<span class="cm"># This is the Python dictionary you want to send</span>
+payload = {
+    <span class="st">"text"</span>:     <span class="st">"The weather in Nairobi is perfect today."</span>,
+    <span class="st">"language"</span>: <span class="st">"en"</span>,
+    <span class="st">"model"</span>:    <span class="st">"sentiment-v2"</span>
+}
+
+<span class="cm"># requests converts it to JSON and places it in the body automatically</span>
+response = requests.post(
+    <span class="st">"https://api.nlpservice.com/v1/analyse"</span>,
+    json=payload,
+    <span class="cm"># json= tells requests: convert this dict to JSON and put it in the body</span>
+    headers={<span class="st">"Authorization"</span>: <span class="st">f"Bearer {API_KEY}"</span>}
+)</pre>
+  </div>
+
+  <h3>See it before you code it</h3>
+  <p>Before writing a single line of Python, paste this URL directly into your browser and hit Enter. You'll see the raw JSON response your script will eventually receive. This makes HTTP tangible — you can see exactly what the API sends back before you try to handle it in code.</p>
+  <div class="code-block">
+    <div class="code-label output"><span>Paste this into your browser address bar</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre>
+https://api.openweathermap.org/data/2.5/weather?q=Nairobi&appid=YOUR_KEY&units=metric
+
+<span class="cm">Replace YOUR_KEY with your actual API key from openweathermap.org</span>
+<span class="cm">You'll see raw JSON — the same data your Python script will receive</span></pre>
+  </div>
+
+  <h3>What is inside an HTTP response?</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Part</th><th>What it tells you</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Status code</strong></td><td>Did it work? 200 = yes, 404 = not found, 500 = server error</td></tr>
+        <tr><td><strong>Headers</strong></td><td>Metadata about the response (content type, rate limit info, etc.)</td></tr>
+        <tr><td><strong>Body</strong></td><td>The actual data — usually JSON</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card slowdown-card">
+    <div class="card-header">🚨 Hold on — what are "headers" exactly?</div>
+    <div class="card-body">
+      <p>Headers are extra information attached to a request or response — like a sticky note on a letter. The most important header you'll use is the <strong>Authorization</strong> header — that's where your API key goes. Another common one is <code>Content-Type: application/json</code>, which tells the server the data you're sending is in JSON format. You don't set most headers manually — the <code>requests</code> library handles them — but you'll always add your API key header by hand.</p>
+    </div>
+  </div>
+</section>
+
+<section id="s4">
+  <h2><span class="section-num">04</span> REST — a set of rules for building APIs <span class="done-check" onclick="toggleDone(this)"><span class="done-check-box"><span class="done-check-tick">✓</span></span>Mark done</span></h2>
+  <p>REST stands for <strong>Representational State Transfer</strong>. You don't need to memorise that. Just know REST is a style of building APIs — a set of rules that make an API predictable and easy to use.</p>
+  <div class="card analogy-card open">
+    <div class="card-header">🔁 Real world version</div>
+    <div class="card-body">
+      <p>Imagine every post office in the world agreed to follow the same rules: packages always go in the same format, labels are always in the same position, tracking numbers always look the same. Once you've shipped a package once, you know how to ship from any post office anywhere.</p>
+      <p>REST is that agreement for APIs. Once you know how REST works, you can pick up almost any REST API in the world because they all follow the same patterns.</p>
+    </div>
+  </div>
+</section>
+
+<section id="s5">
+  <h2><span class="section-num">05</span> REST architecture — the six constraints <span class="done-check" onclick="toggleDone(this)"><span class="done-check-box"><span class="done-check-tick">✓</span></span>Mark done</span></h2>
+  <h3>1. Client-Server</h3>
+  <p>The client (your script) and the server (the API) are completely separate. You can change your script without breaking the server, and vice versa.</p>
+  <h3>2. Stateless</h3>
+  <p>The server does not remember you between requests. Every single request must include all the information the server needs — your API key, your query, everything. This is why you include your authentication headers in every single call, not just the first one.</p>
+  <div class="card slowdown-card">
+    <div class="card-header">🚨 Stateless is actually a feature</div>
+    <div class="card-body">
+      <p>Because the server doesn't have to remember anything, it can handle millions of simultaneous requests without getting confused. The practical impact: always include your auth header and all parameters in every request. Never assume the API "remembers" your last call.</p>
+    </div>
+  </div>
+  <h3>3. Cacheable</h3>
+  <p>Responses can be stored and reused instead of making the same request again. In data pipelines, this matters when you're calling the same endpoint repeatedly — caching can make your work faster and cheaper if the API charges per call.</p>
+  <h3>4. Uniform Interface</h3>
+  <p>Every REST API uses the same structure: standard HTTP methods, standard URL patterns, and standard response formats. Once you know one REST API, you can pick up another very quickly.</p>
+  <div class="card explain-card">
+    <div class="card-header">💡 What "uniform interface" means in practice</div>
+    <div class="card-body">
+      <p>Two completely different APIs — weather data and financial data — both follow REST. Both use GET to fetch, POST to send, JSON in responses, and standard status codes. You don't learn an entirely new system for each API. The interface is uniform across all of them.</p>
+    </div>
+  </div>
+  <h3>5. Layered System</h3>
+  <p>Your request might pass through load balancers, caches, and security gateways. REST allows this — your code stays exactly the same regardless of what's in the middle.</p>
+  <h3>6. Code on Demand (optional)</h3>
+  <p>Servers can optionally send executable code back to the client. Rarely relevant in data science work.</p>
+  <div class="callout"><strong>The two you'll think about most:</strong> Stateless and Uniform Interface. These shape every API call in a data pipeline.</div>
+</section>
+
+<section id="s6">
+  <h2><span class="section-num">06</span> Anatomy of an API request <span class="done-check" onclick="toggleDone(this)"><span class="done-check-box"><span class="done-check-tick">✓</span></span>Mark done</span></h2>
+  <div class="code-block">
+    <div class="code-label output"><span>API URL — fully annotated</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre>
+https://api.openweathermap.org/data/2.5/weather?q=Nairobi&appid=YOUR_KEY&units=metric
+
+<span class="cm">https://                       the protocol — always HTTPS for secure APIs</span>
+<span class="cm">api.openweathermap.org         the host / domain of the API server</span>
+<span class="cm">/data/2.5/weather              the endpoint path — the specific resource we want</span>
+<span class="cm">?                              marks the start of query parameters</span>
+<span class="cm">q=Nairobi                      query param: city we want weather for</span>
+<span class="cm">&appid=YOUR_KEY                query param: our API key for authentication</span>
+<span class="cm">&units=metric                  query param: return temperature in Celsius</span></pre>
+  </div>
+  <h3>Base URL vs endpoint path</h3>
+  <p>The <strong>base URL</strong> is the root address: <code>https://api.openweathermap.org</code>. The <strong>endpoint path</strong> is what you add: <code>/data/2.5/weather</code>. In your code you'll store the base URL as a constant and build the full URL dynamically.</p>
+</section>
+
+<section id="s7">
+  <h2><span class="section-num">07</span> HTTP methods — the verbs of the web <span class="done-check" onclick="toggleDone(this)"><span class="done-check-box"><span class="done-check-tick">✓</span></span>Mark done</span></h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Method</th><th>What it does</th><th>Everyday analogy</th><th>Has body?</th></tr></thead>
+      <tbody>
+        <tr><td><span class="method GET">GET</span></td><td>Fetch / read data</td><td>Reading a menu</td><td>No</td></tr>
+        <tr><td><span class="method POST">POST</span></td><td>Send data / create something</td><td>Placing an order</td><td>Yes</td></tr>
+        <tr><td><span class="method PUT">PUT</span></td><td>Replace something completely</td><td>Replacing your entire order</td><td>Yes</td></tr>
+        <tr><td><span class="method PATCH">PATCH</span></td><td>Update part of something</td><td>Changing just the drink</td><td>Yes</td></tr>
+        <tr><td><span class="method DELETE">DELETE</span></td><td>Remove something</td><td>Cancelling the order</td><td>Sometimes</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card explain-card">
+    <div class="card-header">💡 GET vs POST for data scientists</div>
+    <div class="card-body">
+      <p>You'll use <strong>GET</strong> the most — you're usually pulling data in. GET parameters go directly into the URL, which is fine for non-sensitive things like city names.</p>
+      <p>Use <strong>POST</strong> when you need to send data to the API — submitting text to an NLP model, or sending a large parameter set that won't fit in a URL. POST puts data in the request body, which keeps it out of the URL and allows much larger payloads.</p>
+    </div>
+  </div>
+</section>
+
+<section id="s8">
+  <h2><span class="section-num">08</span> Status codes you must know <span class="done-check" onclick="toggleDone(this)"><span class="done-check-box"><span class="done-check-tick">✓</span></span>Mark done</span></h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Code</th><th>Category</th><th>Meaning</th><th>What you should do</th></tr></thead>
+      <tbody>
+        <tr><td><strong style="color:#0a4a30">200</strong></td><td>Success</td><td>Everything worked</td><td>Parse the JSON and use the data</td></tr>
+        <tr><td><strong style="color:#0a4a30">201</strong></td><td>Created</td><td>Your POST created something</td><td>Confirm and proceed</td></tr>
+        <tr><td><strong style="color:#6b3a00">400</strong></td><td>Bad Request</td><td>Your request has a mistake</td><td>Check your URL, params, and body</td></tr>
+        <tr><td><strong style="color:#6b3a00">401</strong></td><td>Unauthorized</td><td>API key missing or wrong</td><td>Check your authorization header</td></tr>
+        <tr><td><strong style="color:#6b3a00">403</strong></td><td>Forbidden</td><td>Authenticated but not allowed</td><td>Check your subscription tier</td></tr>
+        <tr><td><strong style="color:#6b3a00">404</strong></td><td>Not Found</td><td>That endpoint doesn't exist</td><td>Double-check the URL path</td></tr>
+        <tr><td><strong style="color:#8b2e10">429</strong></td><td>Rate Limited</td><td>Too many requests</td><td>Add delays; check rate limit headers</td></tr>
+        <tr><td><strong style="color:#8b2e10">500</strong></td><td>Server Error</td><td>Something broke on their end</td><td>Wait and retry — not your fault</td></tr>
+        <tr><td><strong style="color:#8b2e10">503</strong></td><td>Unavailable</td><td>API is down</td><td>Wait; check the service status page</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout"><strong>The rule of thumb:</strong> 2xx = success. 4xx = your side. 5xx = their side. Always check the status code before parsing the response body.</div>
+</section>
+
+<section id="s9">
+  <h2><span class="section-num">09</span> Project: Weather Data Pipeline <span class="done-check" onclick="toggleDone(this)"><span class="done-check-box"><span class="done-check-tick">✓</span></span>Mark done</span></h2>
+  <div class="project-banner">
+    <div class="badge">Hands-on Project</div>
+    <h3>Build a Real Weather Data Fetcher</h3>
+    <p>We'll use the OpenWeatherMap API to pull live weather data for multiple African cities and save it to a CSV — exactly how a data pipeline step works in production.</p>
+  </div>
+
+  <h3>Step 1 — Get your free API key</h3>
+  <p>Go to <strong>openweathermap.org</strong>, sign up, and navigate to "API keys" in your dashboard. Copy the key. The free tier allows 60 calls per minute. New keys can take up to 10 minutes to activate.</p>
+
+  <h3>Step 2 — Set up a virtual environment</h3>
+  <p>A virtual environment is an isolated box for your project's libraries so they don't clash with other projects. Always create one before installing anything.</p>
+  <div class="code-block">
+    <div class="code-label terminal"><span>🟢 Create and activate virtual environment</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre>
+<span class="cm"># Create the environment (run once per project)</span>
+python -m venv venv
+
+<span class="cm"># Activate it — Mac / Linux:</span>
+source venv/bin/activate
+
+<span class="cm"># Activate it — Windows:</span>
+venv\Scripts\activate
+
+<span class="cm"># You'll see (venv) appear in your terminal prompt — you're ready</span></pre>
+  </div>
+
+  <h3>Step 3 — Install the libraries</h3>
+  <div class="code-block">
+    <div class="code-label terminal"><span>🟢 Install dependencies</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre>pip install requests python-dotenv pandas</pre>
+  </div>
+
+  <h3>Step 4 — Create your .env and .gitignore files</h3>
+  <p>Your API key is a secret. Store it in a <code>.env</code> file and tell Git to never track it using <code>.gitignore</code> — so it never ends up on GitHub even by accident.</p>
+  <div class="code-block">
+    <div class="code-label env-lb"><span>🟡 Create file: .env</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre>
+<span class="cm"># Replace the value below with your actual API key — no quotes needed</span>
+OPENWEATHER_API_KEY=paste_your_actual_key_here</pre>
+  </div>
+  <div class="code-block">
+    <div class="code-label env-lb"><span>🟡 Create file: .gitignore</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre>
+<span class="cm"># These files will never be tracked by Git</span>
+.env
+__pycache__/
+venv/</pre>
+  </div>
+  <div class="callout-amber"><strong>Why .gitignore matters:</strong> without it, pushing to GitHub makes your API key public. These three lines take 30 seconds and protect you permanently.</div>
+
+  <h3>Step 5 — Part A: Imports and setup</h3>
+  <div class="code-block">
+    <div class="code-label script"><span>🟡 weather_pipeline.py — Part A</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre>
+<span class="kw">import</span> requests
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> time
+<span class="kw">import</span> os
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()
+<span class="cm"># reads the .env file and makes its values available</span>
+
+API_KEY = os.getenv(<span class="st">"OPENWEATHER_API_KEY"</span>)
+
+<span class="kw">if not</span> API_KEY:
+    <span class="kw">raise</span> ValueError(<span class="st">"API key not found. Check your .env file."</span>)
+
+BASE_URL = <span class="st">"https://api.openweathermap.org/data/2.5/weather"</span>
+
+CITIES = [<span class="st">"Nairobi"</span>, <span class="st">"Lagos"</span>, <span class="st">"Accra"</span>, <span class="st">"Kampala"</span>, <span class="st">"Dar es Salaam"</span>]</pre>
+  </div>
+
+  <h3>Step 6 — Part B: The fetch function</h3>
+  <div class="code-block">
+    <div class="code-label script"><span>🟡 weather_pipeline.py — Part B</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre>
+<span class="kw">def</span> <span class="fn">fetch_weather</span>(city_name):
+    params = {<span class="st">"q"</span>: city_name, <span class="st">"appid"</span>: API_KEY, <span class="st">"units"</span>: <span class="st">"metric"</span>}
+
+    <span class="kw">try</span>:
+        response = requests.get(BASE_URL, params=params, timeout=<span class="nm">10</span>)
+
+        <span class="kw">if</span> response.status_code == <span class="nm">200</span>:
+            data = response.json()
+            <span class="kw">return</span> {
+                <span class="st">"city"</span>:          data[<span class="st">"name"</span>],
+                <span class="st">"country"</span>:       data[<span class="st">"sys"</span>][<span class="st">"country"</span>],
+                <span class="st">"temperature_c"</span>: data[<span class="st">"main"</span>][<span class="st">"temp"</span>],
+                <span class="st">"feels_like_c"</span>:  data[<span class="st">"main"</span>][<span class="st">"feels_like"</span>],
+                <span class="st">"humidity_pct"</span>:  data[<span class="st">"main"</span>][<span class="st">"humidity"</span>],
+                <span class="st">"description"</span>:   data[<span class="st">"weather"</span>][<span class="nm">0</span>][<span class="st">"description"</span>],
+                <span class="st">"wind_speed_ms"</span>: data[<span class="st">"wind"</span>][<span class="st">"speed"</span>]
+            }
+        <span class="kw">elif</span> response.status_code == <span class="nm">401</span>:
+            print(<span class="st">f"[AUTH ERROR] Check your API key. Got 401 for {city_name}"</span>)
+        <span class="kw">elif</span> response.status_code == <span class="nm">404</span>:
+            print(<span class="st">f"[NOT FOUND] City not recognised: {city_name}"</span>)
+        <span class="kw">elif</span> response.status_code == <span class="nm">429</span>:
+            print(<span class="st">f"[RATE LIMIT] Waiting 60 seconds..."</span>)
+            time.sleep(<span class="nm">60</span>)
+        <span class="kw">else</span>:
+            print(<span class="st">f"[ERROR] Status {response.status_code} for {city_name}"</span>)
+        <span class="kw">return None</span>
+
+    <span class="kw">except</span> requests.exceptions.Timeout:
+        print(<span class="st">f"[TIMEOUT] Request timed out for {city_name}"</span>)
+        <span class="kw">return None</span>
+    <span class="kw">except</span> requests.exceptions.ConnectionError:
+        print(<span class="st">f"[CONNECTION ERROR] Check your internet connection."</span>)
+        <span class="kw">return None</span></pre>
+  </div>
+
+  <h3>Step 7 — Part C: The pipeline loop</h3>
+  <div class="code-block">
+    <div class="code-label script"><span>🟡 weather_pipeline.py — Part C</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre>
+<span class="kw">def</span> <span class="fn">run_pipeline</span>():
+    all_results = []
+    print(<span class="st">"Starting weather pipeline...\n"</span>)
+
+    <span class="kw">for</span> city <span class="kw">in</span> CITIES:
+        print(<span class="st">f"Fetching: {city}"</span>)
+        result = <span class="fn">fetch_weather</span>(city)
+
+        <span class="kw">if</span> result <span class="kw">is not None</span>:
+            all_results.append(result)
+            print(<span class="st">f"  Done: {result['city']} — {result['temperature_c']}C, {result['description']}"</span>)
+        <span class="kw">else</span>:
+            print(<span class="st">f"  Skipped {city}"</span>)
+
+        time.sleep(<span class="nm">1</span>)
+
+    <span class="kw">if</span> all_results:
+        df = pd.DataFrame(all_results)
+        df[<span class="st">"fetched_at"</span>] = pd.Timestamp.now()
+        df.to_csv(<span class="st">"weather_data.csv"</span>, index=<span class="kw">False</span>)
+        print(<span class="st">f"\nDone. {len(df)} cities saved to weather_data.csv"</span>)
+        print(df[[<span class="st">"city"</span>, <span class="st">"temperature_c"</span>, <span class="st">"humidity_pct"</span>, <span class="st">"description"</span>]])
+    <span class="kw">else</span>:
+        print(<span class="st">"No data collected. Check errors above."</span>)
+
+
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
+    <span class="fn">run_pipeline</span>()</pre>
+  </div>
+
+  <h3>Step 8 — Run it</h3>
+  <div class="code-block">
+    <div class="code-label terminal"><span>🟢 Run in Terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre>python weather_pipeline.py</pre>
+  </div>
+  <div class="win-box">This is a production-quality data pipeline. It authenticates, fetches, handles errors, and saves results. This exact pattern is what data engineers write every day.</div>
+</section>
+
+<section id="s10">
+  <h2><span class="section-num">10</span> Common errors and fixes <span class="done-check" onclick="toggleDone(this)"><span class="done-check-box"><span class="done-check-tick">✓</span></span>Mark done</span></h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Error</th><th>Likely cause</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td><code>401 Unauthorized</code></td><td>Key wrong, missing, or not yet activated</td><td>Check .env; new keys take up to 10 minutes</td></tr>
+        <tr><td><code>404 Not Found</code></td><td>City name wrong or endpoint path incorrect</td><td>Test the URL in your browser first</td></tr>
+        <tr><td><code>JSONDecodeError</code></td><td>Calling .json() on a failed response</td><td>Always check status_code == 200 first</td></tr>
+        <tr><td><code>ConnectionError</code></td><td>No internet or wrong URL</td><td>Check your network; verify BASE_URL</td></tr>
+        <tr><td><code>KeyError: 'main'</code></td><td>Accessing a field that doesn't exist</td><td>Print response.text first to see the actual structure</td></tr>
+        <tr><td><code>429 Too Many Requests</code></td><td>Sending requests too fast</td><td>Add time.sleep(1) between requests</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout"><strong>Debug tip:</strong> add <code>print(response.text)</code> before parsing JSON. The raw response usually tells you in plain English exactly what went wrong.</div>
+</section>
+
+<section id="s11">
+  <h2><span class="section-num">11</span> Practice tasks <span class="done-check" onclick="toggleDone(this)"><span class="done-check-box"><span class="done-check-tick">✓</span></span>Mark done</span></h2>
+  <div class="task-box"><div class="task-num">Task 01 — Easy</div><p>Add three more African cities to the CITIES list and re-run. Confirm they appear in the CSV.</p></div>
+  <div class="task-box"><div class="task-num">Task 02 — Easy</div><p>Add a column to the DataFrame that shows temperature in Fahrenheit. Formula: <code>(celsius * 9/5) + 32</code>.</p></div>
+  <div class="task-box"><div class="task-num">Task 03 — Medium</div><p>Explore the <code>/forecast</code> endpoint in the OpenWeatherMap docs. Fetch a 5-day forecast for Nairobi and print the temperature for each day.</p></div>
+  <div class="task-box"><div class="task-num">Task 04 — Medium</div><p>Add a retry mechanism. If a request fails with a 500 or connection error, try again up to 3 times with a 5-second pause between attempts.</p></div>
+  <div class="task-box"><div class="task-num">Task 05 — Challenge</div><p>Schedule the pipeline to run every hour using Python's <code>schedule</code> library. Each run should append to the CSV rather than overwriting it.</p></div>
+</section>
+
+<section id="s12">
+  <h2><span class="section-num">12</span> How it all fits together <span class="done-check" onclick="toggleDone(this)"><span class="done-check-box"><span class="done-check-tick">✓</span></span>Mark done</span></h2>
+  <div class="diagram">
+    <strong>HTTP</strong> is the protocol — encrypted by HTTPS<br>
+    <span class="arrow">↓</span><br>
+    <strong>DNS</strong> converts domain names to server IP addresses<br>
+    <span class="arrow">↓</span><br>
+    <strong>REST</strong> is a style of API design that runs on top of HTTP<br>
+    <span class="arrow">↓</span><br>
+    <strong>An API endpoint</strong> is a specific URL representing a resource<br>
+    <span class="arrow">↓</span><br>
+    <strong>HTTP methods</strong> tell the server what action to take<br>
+    <span class="arrow">↓</span><br>
+    <strong>Status codes</strong> tell you whether it worked<br>
+    <span class="arrow">↓</span><br>
+    <strong>JSON</strong> carries the data back to you<br>
+    <span class="arrow">↓</span><br>
+    <strong>Your Python script</strong> parses it and saves to CSV
+  </div>
+  <h3>Where this leads</h3>
+  <ul>
+    <li>Building automated data ingestion pipelines (ETL/ELT)</li>
+    <li>Integrating with cloud ML services via POST</li>
+    <li>Building your own APIs that serve model predictions</li>
+    <li>Connecting live data to Power BI or Tableau</li>
+    <li>Working with Twitter, Google Analytics, Stripe, or M-Pesa APIs</li>
+  </ul>
+  <div class="callout"><strong>You covered:</strong> HTTP/HTTPS theory, DNS, REST architecture, URL anatomy, HTTP methods, status codes, request bodies, virtual environments, .env security, .gitignore setup, and a production-style data pipeline. That's a real foundation.</div>
+</section>
+
+<section id="s13">
+  <h2><span class="section-num">13</span> Complete script — copy and run <span class="done-check" onclick="toggleDone(this)"><span class="done-check-box"><span class="done-check-tick">✓</span></span>Mark done</span></h2>
+  <p>Got lost following the step-by-step? No problem. Copy this entire block into a file called <code>weather_pipeline.py</code> and run it directly. Make sure your <code>.env</code> and <code>.gitignore</code> are set up first (Step 4 above).</p>
+  <div class="code-block">
+    <div class="code-label script"><span>🟡 Complete script — copy everything into weather_pipeline.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre>
+<span class="kw">import</span> requests
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> time
+<span class="kw">import</span> os
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()
+API_KEY = os.getenv(<span class="st">"OPENWEATHER_API_KEY"</span>)
+
+<span class="kw">if not</span> API_KEY:
+    <span class="kw">raise</span> ValueError(<span class="st">"API key not found. Check your .env file."</span>)
+
+BASE_URL = <span class="st">"https://api.openweathermap.org/data/2.5/weather"</span>
+CITIES   = [<span class="st">"Nairobi"</span>, <span class="st">"Lagos"</span>, <span class="st">"Accra"</span>, <span class="st">"Kampala"</span>, <span class="st">"Dar es Salaam"</span>]
+
+
+<span class="kw">def</span> <span class="fn">fetch_weather</span>(city_name):
+    params = {<span class="st">"q"</span>: city_name, <span class="st">"appid"</span>: API_KEY, <span class="st">"units"</span>: <span class="st">"metric"</span>}
+    <span class="kw">try</span>:
+        response = requests.get(BASE_URL, params=params, timeout=<span class="nm">10</span>)
+        <span class="kw">if</span> response.status_code == <span class="nm">200</span>:
+            data = response.json()
+            <span class="kw">return</span> {
+                <span class="st">"city"</span>:          data[<span class="st">"name"</span>],
+                <span class="st">"country"</span>:       data[<span class="st">"sys"</span>][<span class="st">"country"</span>],
+                <span class="st">"temperature_c"</span>: data[<span class="st">"main"</span>][<span class="st">"temp"</span>],
+                <span class="st">"feels_like_c"</span>:  data[<span class="st">"main"</span>][<span class="st">"feels_like"</span>],
+                <span class="st">"humidity_pct"</span>:  data[<span class="st">"main"</span>][<span class="st">"humidity"</span>],
+                <span class="st">"description"</span>:   data[<span class="st">"weather"</span>][<span class="nm">0</span>][<span class="st">"description"</span>],
+                <span class="st">"wind_speed_ms"</span>: data[<span class="st">"wind"</span>][<span class="st">"speed"</span>]
+            }
+        <span class="kw">elif</span> response.status_code == <span class="nm">401</span>: print(<span class="st">f"[AUTH ERROR] {city_name}"</span>)
+        <span class="kw">elif</span> response.status_code == <span class="nm">404</span>: print(<span class="st">f"[NOT FOUND] {city_name}"</span>)
+        <span class="kw">elif</span> response.status_code == <span class="nm">429</span>: print(<span class="st">"[RATE LIMIT] Waiting 60s..."</span>); time.sleep(<span class="nm">60</span>)
+        <span class="kw">else</span>: print(<span class="st">f"[ERROR] Status {response.status_code} for {city_name}"</span>)
+        <span class="kw">return None</span>
+    <span class="kw">except</span> requests.exceptions.Timeout:
+        print(<span class="st">f"[TIMEOUT] {city_name}"</span>); <span class="kw">return None</span>
+    <span class="kw">except</span> requests.exceptions.ConnectionError:
+        print(<span class="st">"[CONNECTION ERROR] Check your internet."</span>); <span class="kw">return None</span>
+
+
+<span class="kw">def</span> <span class="fn">run_pipeline</span>():
+    all_results = []
+    print(<span class="st">"Starting weather pipeline...\n"</span>)
+
+    <span class="kw">for</span> city <span class="kw">in</span> CITIES:
+        print(<span class="st">f"Fetching: {city}"</span>)
+        result = <span class="fn">fetch_weather</span>(city)
+        <span class="kw">if</span> result:
+            all_results.append(result)
+            print(<span class="st">f"  Done: {result['city']} — {result['temperature_c']}C, {result['description']}"</span>)
+        <span class="kw">else</span>:
+            print(<span class="st">f"  Skipped {city}"</span>)
+        time.sleep(<span class="nm">1</span>)
+
+    <span class="kw">if</span> all_results:
+        df = pd.DataFrame(all_results)
+        df[<span class="st">"fetched_at"</span>] = pd.Timestamp.now()
+        df.to_csv(<span class="st">"weather_data.csv"</span>, index=<span class="kw">False</span>)
+        print(<span class="st">f"\nDone. {len(df)} cities saved to weather_data.csv"</span>)
+        print(df[[<span class="st">"city"</span>, <span class="st">"temperature_c"</span>, <span class="st">"humidity_pct"</span>, <span class="st">"description"</span>]])
+    <span class="kw">else</span>:
+        print(<span class="st">"No data collected. Check errors above."</span>)
+
+
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
+    <span class="fn">run_pipeline</span>()</pre>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <strong>MLlabswithMel</strong> — Hands-on data &amp; AI education<br>
+  <span style="font-size:.82rem;margin-top:.3rem;display:block;color:var(--faint)">APIs for Dummies: A Data Scientist's Guide</span>
+</footer>
+
+<script>
+  document.querySelectorAll('.card-header').forEach(function(h) {
+    h.addEventListener('click', function() { h.closest('.card').classList.toggle('open'); });
+  });
+
+  function toggleDone(el) {
+    el.classList.toggle('checked');
+  }
+
+  function copyCode(btn) {
+    var pre = btn.closest('.code-block').querySelector('pre');
+    var text = pre ? pre.innerText : '';
+    navigator.clipboard.writeText(text).then(function() {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }).catch(function() {
+      btn.textContent = 'Failed';
+      setTimeout(function() { btn.textContent = 'Copy'; }, 1500);
+    });
+  }
+
+  var sections = document.querySelectorAll('main section[id]');
+  var tocLinks = document.querySelectorAll('#toc-list a');
+  function updateToc() {
+    var y = window.scrollY + 120;
+    var cur = '';
+    sections.forEach(function(s) { if (s.offsetTop <= y) cur = s.id; });
+    tocLinks.forEach(function(a) { a.classList.toggle('active', a.getAttribute('href') === '#' + cur); });
+  }
+  window.addEventListener('scroll', updateToc, { passive: true });
+  updateToc();
+</script>
+</body>
+</html>
